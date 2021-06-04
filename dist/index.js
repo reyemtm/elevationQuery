@@ -24997,7 +24997,7 @@ async function getElevations(pointArray, options) {
 
   for (let i = 0; i < pointArray.length; i++) {
 
-    const url  = (!provider.toLowerCase() != "usgs") ? `https://www.gmrt.org/services/PointServer?latitude=${pointArray[i][1]}&longitude=${pointArray[i][0]}&format=text%2Fplain` : `https://nationalmap.gov/epqs/pqs.php?x=${pointArray[i][0]}&y=${pointArray[i][1]}&units=Feet&output=json&units=Meters`;
+    const url  = (!provider.toLowerCase() != "usgs") ? `https://www.gmrt.org/services/PointServer?latitude=${pointArray[i][1]}&longitude=${pointArray[i][0]}&format=text%2Fplain` : `https://nationalmap.gov/epqs/pqs.php?x=${pointArray[i][0]}&y=${pointArray[i][1]}&output=json&units=Meters`;
 
     try {
       const res = await fetch(url, {

@@ -24979,13 +24979,13 @@ fetch.Promise = global.Promise;class GeoJSON {
 }
 
 /**
- * getElevation function to query elevation and optionally batheymetry data from the USGS service or the GMRT service
+ * getElevations function to query elevation and optionally batheymetry data from the USGS service or the GMRT service
  * @param {*} pointArray An array of coordinates in [x,y] format
  * @param {*} options 
  * @returns {Object, Object}
  */
 
-async function getElevation(pointArray, options) {
+async function getElevations(pointArray, options) {
 
   const provider = (!options || !options.provider || options.provider.toLowerCase() != "usgs") ? "GMRT" : "USGS";
 
@@ -25057,4 +25057,4 @@ function getPointArray(geojsonLine, options) {
   
   return pointArray
 
-}var elQ=/*#__PURE__*/Object.freeze({__proto__:null,getElevation: getElevation,getPointArray: getPointArray});export default elQ;
+}var elQ=/*#__PURE__*/Object.freeze({__proto__:null,getElevations: getElevations,getPointArray: getPointArray});export default elQ;

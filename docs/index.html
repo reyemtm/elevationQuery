@@ -93,7 +93,7 @@
       const length = Math.round(turf.length(data) * 3280.84);
       // console.log(length)
       const profileArray = elQ.getPointArray(turf.flatten(data), {max: 100});
-      const { elevationArray, featureCollection } = await elQ.getElevation(profileArray, {provider: ""});
+      const { elevationArray, featureCollection } = await elQ.getElevations(profileArray, {provider: ""});
       console.log(featureCollection)
       const distanceArray = getLengthArray(profileArray, length)
       const scatterPlotData = getScatterPlotData(distanceArray,elevationArray)

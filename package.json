@@ -1,12 +1,12 @@
 {
   "name": "elevation-query",
   "type": "module",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Get surface elevation data and bathymetry data (STRM 30-meters/USGS 3DEP 1/3 arc-second) from a GeoJSON LineString.",
   "main": "dist/index.js",
   "homepage": "https://github.com/reyemtm/elevationQuery",
   "scripts": {
-    "build": "rollup --config"
+    "build": "rollup --config && git add . && git commit -m 'auto' && git push && npm publish"
   },
   "author": "Malcolm Meyer",
   "license": "MIT",

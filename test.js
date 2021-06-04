@@ -1,6 +1,7 @@
 // import {getElevation, getPointArray} from "./src/elevationQuery.js";
-import {getElevation, getPointArray} from "./dist/elevationQuery.min.js"
+import elQ from "./dist/index.js";
 import fs from "fs";
+const { getElevation, getPointArray } = elQ;
 
 const line = JSON.parse(fs.readFileSync("./docs/trail.geojson"));
 const points = getPointArray(line, {max: 5});

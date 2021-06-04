@@ -25057,4 +25057,4 @@ function getPointArray(geojsonLine, options) {
   
   return pointArray
 
-}export{getElevation,getPointArray};
+}var elQ=/*#__PURE__*/Object.freeze({__proto__:null,getElevation: getElevation,getPointArray: getPointArray});export default elQ;

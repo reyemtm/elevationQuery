@@ -2,9 +2,9 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 export default [
   {
-    input: 'src/elevationQuery.js',
+    input: 'src/index.js',
     output: {
-      file: 'dist/elevationQuery.min.js',
+      file: 'dist/index.js',
       format: 'es',
       compact: true
     },

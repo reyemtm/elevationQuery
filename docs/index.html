@@ -5,18 +5,20 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>area > boundaries | Chart.js sample</title>
-  <link rel="stylesheet" type="text/css" href="/style.css">
+  <title>Elevation Profile</title>
+  <!-- <link rel="stylesheet" type="text/css" href="/style.css"> -->
   <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/Turf.js/6.3.0/turf.min.js'></script>
-  <script src="/utils.js"></script>
+  <script src="utils.js"></script>
   <!-- <script src="analyser.js"></script> -->
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/wingcss/0.1.9/wing.min.css' />
   <style>
-    html,
     body {
       background-color: whitesmoke;
       margin: 0;
+    }
+    h1 {
+      margin: 0 0 1rem
     }
 
     .container {
@@ -30,7 +32,7 @@
     }
     .loading>div {
       background: black;
-      width: 0;
+      width: 0%;
       height: 100%;
     }
     
@@ -38,30 +40,15 @@
 </head>
 
 <body>
-  <div class="loading">
+  <div class="loading2">
     <div></div>
   </div>
   <div class="container">
+    <h1 style="text-align: center">Surface Elevation (ft)</h1>
     <div class="chart"><canvas id="chart-0"></canvas></div>
   </div>
-
+  <script src="elevationQueryUMD.min.js"></script>
   <script>
-    function getPointArray(geojsonLine) {
-      
-      const pointArray = [];
-      const length = Math.round(turf.length(geojsonLine, {units: 'feet'}));
-      const n = 20;
-      const unitsN = (length > n) ? Math.round(length / n) : 5;
-      let start = 0;
-      //TODO
-      for (let i = 0; i < n; i++) {
-        const point = turf.along(geojsonLine.features[0], start, {units: 'feet'});
-        pointArray.push(point.geometry.coordinates);
-        start = start + unitsN
-      }
-      pointArray.push(geojsonLine.features[0].geometry.coordinates[geojsonLine.features[0].geometry.coordinates.length - 1]);
-      return pointArray
-    }
 
     function getLengthArray(pointArray, totalLength) {
       const lengthArray = [];
@@ -84,34 +71,6 @@
       return lengthArray
     }
 
-    async function getElevationArray(pointArray) {
-      const elevationArray = [];
-
-      console.log(pointArray.length)
-
-      for (let i = 0; i < pointArray.length; i++) {
-        try {
-          const res = await fetch(`https://nationalmap.gov/epqs/pqs.php?x=${pointArray[i][0]}&y=${pointArray[i][1]}&units=Feet&output=json`, {
-            cache: 'force-cache',
-            timeout: 30
-          });
-          const elevation = await res.json();
-          document.querySelector(".loading div").style.width = (!i) ? 0 : (i / pointArray.length * 100) + "%"
-          if (elevation && elevation["USGS_Elevation_Point_Query_Service"]["Elevation_Query"].Elevation) {
-            elevationArray.push(elevation["USGS_Elevation_Point_Query_Service"]["Elevation_Query"].Elevation)
-           }else{
-            elevationArray.push(null)
-           }
-        }
-        catch(err) {
-          console.log(err)
-          elevationArray.push(null)
-        }
-      }
-      document.querySelector(".loading").style.display = "none"
-      return elevationArray
-    }
-
     function getScatterPlotData(distances, elevations) {
       if (elevations.length != distances.length) return
 
@@ -129,15 +88,16 @@
 
     (async function () {
 
-      const res = await fetch("data.geojson");
+      const res = await fetch("trail.geojson");
       const data = await res.json();
-      const length = Math.round(turf.length(data, {units: 'feet'}));
-      console.log(length)
-      const profileArray = getPointArray(turf.flatten(data));
-      const elevationArray = await getElevationArray(profileArray)
+      const length = Math.round(turf.length(data) * 3280.84);
+      // console.log(length)
+      const profileArray = elQ.getPointArray(turf.flatten(data), {max: 100});
+      const { elevationArray, featureCollection } = await elQ.getElevation(profileArray, {provider: ""});
+      console.log(featureCollection)
       const distanceArray = getLengthArray(profileArray, length)
       const scatterPlotData = getScatterPlotData(distanceArray,elevationArray)
-      console.log(scatterPlotData.length)
+      // console.log(scatterPlotData.length)
       const lineData = [{
         x: 0,
         y: data.features[0].properties.invertstart
@@ -182,39 +142,49 @@
       };
 
       ['start'].forEach(function (boundary, index) {
-        console.log(JSON.stringify(lineData));
-        console.log(JSON.stringify(scatterPlotData))
-
+        // console.log(JSON.stringify(lineData));
+        // console.log(JSON.stringify(scatterPlotData))
         new Chart('chart-' + index, {
           type: 'scatter',
           data: {
             labels: "Label",
             datasets: [{
-                backgroundColor: "rgba(0,0,0,0.05)",
+                backgroundColor: "rgba(142,27,143,0.2)",
                 borderColor: "black",
                 data: scatterPlotData,
-                label: 'Surface Elevation (USGS ft)',
+                label: 'Surface Elevation (ft)',
+                legend: false,
                 fill: true,
                 showLine: true,
+                borderColor: "rgb(142,27,143)",
                 // pointBackgroundColor: "Red",
                 pointRadius: 0,
               },
-              {
-                label: 'Line Profile',
-                data: lineData,
-                fill: false,
-                borderColor: "red",
-                pointRadius: 6,
-                pointBackgroundColor: "red",
-                showLine: true
-              }
+              // {
+              //   label: 'Line Profile',
+              //   data: lineData,
+              //   fill: false,
+              //   borderColor: "red",
+              //   pointRadius: 6,
+              //   pointBackgroundColor: "red",
+              //   showLine: true
+              // }
             ]
           },
           options: Chart.helpers.merge(chartOptions, {
             title: {
               text: 'Elevation Profile',
-              display: false
+              display: false,
+              fontSize: 48
             },
+            legend: {
+              display: false,
+              labels: {
+                font: {
+                  size: 48
+                }
+              }
+            }
           })
         });
       });

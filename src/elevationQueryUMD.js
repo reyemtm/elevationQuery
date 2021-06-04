@@ -19,13 +19,13 @@ class GeoJSON {
 }
 
 /**
- * getElevation function to query elevation and optionally batheymetry data from the USGS service or the GMRT service
+ * getElevations function to query elevation and optionally batheymetry data from the USGS service or the GMRT service
  * @param {*} pointArray An array of coordinates in [x,y] format
  * @param {*} options 
  * @returns {Object, Object}
  */
 
-export async function getElevation(pointArray, options) {
+export async function getElevations(pointArray, options) {
 
   const provider = (!options || !options.provider || options.provider.toLowerCase() != "usgs") ? "GMRT" : "USGS";
 

@@ -27,8 +27,8 @@ class GeoJSON {
 
 export async function getElevations(pointArray, options) {
 
-  const provider = (!options || !options.provider || options.provider.toLowerCase() != "usgs") ? "GMRT" : "USGS";
-
+  const provider = (options && options.provider.toLowerCase() === "usgs") ? "USGS" : "GMRT";
+  
   const elevationArray = [];
   const featureCollection = {
     type: "FeatureCollection",
@@ -37,7 +37,9 @@ export async function getElevations(pointArray, options) {
 
   for (let i = 0; i < pointArray.length; i++) {
 
-    const url  = (!provider.toLowerCase() != "usgs") ? `https://www.gmrt.org/services/PointServer?latitude=${pointArray[i][1]}&longitude=${pointArray[i][0]}&format=text%2Fplain` : `https://nationalmap.gov/epqs/pqs.php?x=${pointArray[i][0]}&y=${pointArray[i][1]}&output=json&units=Meters`
+    const url  = (provider === "GMRT") ? 
+    `https://www.gmrt.org/services/PointServer?latitude=${pointArray[i][1]}&longitude=${pointArray[i][0]}&format=text%2Fplain` :
+    `https://nationalmap.gov/epqs/pqs.php?x=${pointArray[i][0]}&y=${pointArray[i][1]}&output=json&units=Meters`
 
     try {
       const res = await fetch(url, {
@@ -45,7 +47,7 @@ export async function getElevations(pointArray, options) {
         timeout: 3000
       });
 
-      const elevation = await res.text();
+      const elevation = (provider === 'USGS') ? await res.json() : await res.text();
 
       const geojson = new GeoJSON(elevation, provider, pointArray[i]);
 

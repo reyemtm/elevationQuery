@@ -24965,7 +24965,7 @@ fetch.Promise = global.Promise;class GeoJSON {
     this.type = "Feature";
     this.properties = {};
     this.properties.provider = provider,
-    this.properties.source = (provider === "USGS") ? data.USGS_Elevation_Point_Query_Service.Elevation_Query.Data_Source : "SRTM 30-Meter || 3DEP 1/3 arc-second",
+    this.properties.source = (provider === "USGS") ? data["USGS_Elevation_Point_Query_Service"]["Elevation_Query"]["Data_Source"] : "SRTM 30-Meter || 3DEP 1/3 arc-second",
     this.properties.units = "Meters";
     this.geometry = (data.geometry) ? data.geometry : {};
     if (!data.geometry) {
@@ -24987,7 +24987,7 @@ fetch.Promise = global.Promise;class GeoJSON {
 
 async function getElevations(pointArray, options) {
 
-  const provider = (!options || !options.provider || options.provider.toLowerCase() != "usgs") ? "GMRT" : "USGS";
+  const provider = (options && options.provider.toLowerCase() === "usgs") ? "USGS" : "GMRT";
 
   const elevationArray = [];
   const featureCollection = {
@@ -24997,15 +24997,20 @@ async function getElevations(pointArray, options) {
 
   for (let i = 0; i < pointArray.length; i++) {
 
-    const url  = (!provider.toLowerCase() != "usgs") ? `https://www.gmrt.org/services/PointServer?latitude=${pointArray[i][1]}&longitude=${pointArray[i][0]}&format=text%2Fplain` : `https://nationalmap.gov/epqs/pqs.php?x=${pointArray[i][0]}&y=${pointArray[i][1]}&output=json&units=Meters`;
+    const url  = (provider === "GMRT") ? 
+    `https://www.gmrt.org/services/PointServer?latitude=${pointArray[i][1]}&longitude=${pointArray[i][0]}&format=text%2Fplain` :
+    `https://nationalmap.gov/epqs/pqs.php?x=${pointArray[i][0]}&y=${pointArray[i][1]}&output=json&units=Meters`;
+
+
+    console.log(url);
 
     try {
       const res = await fetch(url, {
         cache: 'force-cache',
-        timeout: 3000
+        timeout: 300000
       });
 
-      const elevation = await res.text();
+      const elevation = (provider === 'USGS') ? await res.json() : await res.text();
 
       const geojson = new GeoJSON(elevation, provider, pointArray[i]);
 

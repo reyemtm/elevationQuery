@@ -24973,7 +24973,7 @@ fetch.Promise = global.Promise;class GeoJSON {
       this.geometry.coordinates = (provider === "USGS") ? 
         [data["USGS_Elevation_Point_Query_Service"]["Elevation_Query"].x, data["USGS_Elevation_Point_Query_Service"]["Elevation_Query"].y, data["USGS_Elevation_Point_Query_Service"]["Elevation_Query"].Elevation]
       :
-        [point[0], point[1], data];
+        [point[0], point[1], Number(data)];
     }
   }
 }
